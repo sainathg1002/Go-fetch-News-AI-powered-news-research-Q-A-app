@@ -1,0 +1,12 @@
+streamlit
+requests
+beautifulsoup4
+faiss-cpu
+numpy
+sentence-transformers
+python-dotenv
+
+
+
+
+
