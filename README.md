@@ -39,17 +39,56 @@ Produces concise, source-aware answers
 
 Ensures responses are grounded in fetched news data
 
-⚙️ Tech Stack
+🧰 Tech Used
+🧠 AI & LLM
 
-Python
+Groq API – High-speed LLM inference for news understanding and question answering
 
-Groq API (LLM inference)
+Large Language Models (LLMs) – Used for contextual reasoning over fetched news content
 
-Web scraping / content extraction
+🐍 Backend & Core Logic
 
-Prompt engineering
+Python – Core application logic and orchestration
 
-Text chunking & context management
+Agent-style pipeline – Modular flow for fetching, processing, and answering
+
+🌐 Data Ingestion
+
+Web Scraping / Article Extraction – Fetches and cleans news content from URLs
+
+HTML Parsing – Extracts readable text from web pages
+
+🧩 Text Processing
+
+Text Chunking – Splits long articles into manageable chunks for LLM context handling
+
+Context Injection – Injects relevant article chunks into LLM prompts
+
+🔐 Configuration & Environment
+
+dotenv (.env) – Secure API key management
+
+Environment variables – Keeps secrets out of source code
+
+📦 Dependency Management & Execution
+
+uv – Fast Python package installer
+
+pip / requirements.txt – Dependency specification
+
+CLI-based execution – Run via python main.py
+
+🧪 Development Practices
+
+Modular code structure – Easy to extend and maintain
+
+Prompt engineering – Carefully structured prompts for grounded answers
+
+Error handling & validation – Basic runtime checks for stability
+
+🔑 One-Line Summary (Resume-Ready)
+
+Go-Fetch-News is built using Python and Groq-powered LLM inference, combining web data ingestion, text chunking, and prompt-based reasoning to deliver fast, context-aware news Q&A.
 
 📥 How to Download the Project
 
@@ -122,3 +161,4 @@ Persistent vector storage
 📝 Note
 
 This project is built for learning, experimentation, and showcasing GenAI system design using real-world data and fast LLM inference.
+
