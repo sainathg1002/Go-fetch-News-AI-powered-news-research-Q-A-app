@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# 🚀 GoFetch – AI-Powered News Research & Q&A Tool
 
 I recently built a Streamlit-based intelligent research assistant that leverages Retrieval-Augmented Generation (RAG) to answer questions from multiple web sources with high accuracy and speed.
@@ -83,11 +84,10 @@ streamlit run app.py
 
 Contributions, issues, and feature requests are welcome!
 
-## 📝 License
-
-This project is open source and available under the MIT License.
-
 ---
+📝 Note
+
+This project is built for learning, experimentation, and showcasing GenAI system design using real-world data and fast LLM inference.
 
 **Built by Venkata Sai** • AI & Full Stack Enthusiast
-
+=======
