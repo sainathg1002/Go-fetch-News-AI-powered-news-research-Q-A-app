@@ -279,22 +279,22 @@ st.markdown("<div class='content-card'>", unsafe_allow_html=True)
 
 st.subheader("Add News Article URLs (Max 3)")
 
-st.markdown("###Try Instantly ?")
+st.markdown("### 🚀 Try Instantly")
 st.caption("Click below to auto-fill sample news articles.")
 
-if st.button(" Use Sample URLs", key="sample_urls_button"):
-    for i in range(3):
-        st.session_state[f"url_{i}"] = SAMPLE_URLS[i]
-    st.rerun()
+if st.button("📌 Use Sample URLs", key="sample_urls_button"):
+    st.session_state.url_inputs = SAMPLE_URLS.copy()
 
 urls = []
 
 for i in range(3):
     url = st.text_input(
         f"URL {i+1}",
+        value=st.session_state.url_inputs[i],
         key=f"url_{i}"
     )
     urls.append(url)
+    st.session_state.url_inputs[i] = url
 
 if st.button("Process Urls", key="process_urls_button"):
 
