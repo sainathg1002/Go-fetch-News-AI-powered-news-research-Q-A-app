@@ -5,44 +5,49 @@ from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 from groq_llm import ask_groq
 
+# Load embedding model once
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-# ---------- URL LOADER ----------
+# ---------------- URL LOADER ---------------- #
 def fetch_text(url):
     try:
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            "User-Agent": "Mozilla/5.0"
         }
         r = requests.get(url, headers=headers, timeout=15)
         r.raise_for_status()
 
         soup = BeautifulSoup(r.text, "html.parser")
 
-        # remove junk
-        for tag in soup(["script", "style", "noscript", "header", "footer", "nav"]):
+        # Remove junk elements
+        for tag in soup(["script", "style", "noscript",
+                         "header", "footer", "nav",
+                         "aside", "form", "iframe"]):
             tag.decompose()
 
-        # PRIORITY 1: article tag
+        # Priority 1: article tag
         article = soup.find("article")
         if article:
             text = article.get_text(separator=" ", strip=True)
         else:
-            # PRIORITY 2: paragraph aggregation
+            # Priority 2: paragraphs
             paragraphs = soup.find_all("p")
             text = " ".join(p.get_text(strip=True) for p in paragraphs)
 
+        # Priority 3: fallback to body
+        if len(text) < 500:
+            body = soup.find("body")
+            if body:
+                text = body.get_text(separator=" ", strip=True)
+
         return text.strip()
 
-    except Exception as e:
-        print(f"❌ Error fetching {url}: {e}")
+    except Exception:
         return ""
 
 
-
-
-
-# ---------- TEXT SPLITTER ----------
+# ---------------- TEXT CHUNKING ---------------- #
 def chunk_text(text, size=500, overlap=100):
     chunks = []
     start = 0
@@ -52,8 +57,9 @@ def chunk_text(text, size=500, overlap=100):
     return chunks
 
 
-# ---------- FAISS INDEX ----------
+# ---------------- FAISS INDEX ---------------- #
 def build_faiss(chunks):
+
     embeddings = embedder.encode(
         chunks,
         convert_to_numpy=True,
@@ -62,11 +68,13 @@ def build_faiss(chunks):
 
     index = faiss.IndexFlatIP(embeddings.shape[1])
     index.add(embeddings)
+
     return index
 
 
-# ---------- RETRIEVAL + GENERATION ----------
-def rag_query(question, chunks, sources, index, k=8):
+# ---------------- RAG QUERY ---------------- #
+def rag_query(question, chunks, sources, index, api_key, k=50):
+
     q_emb = embedder.encode(
         [question],
         normalize_embeddings=True
@@ -81,8 +89,8 @@ def rag_query(question, chunks, sources, index, k=8):
     for idx in idxs[0]:
         src = sources[idx]
 
-        # limit dominance of one source
-        if source_count.get(src, 0) >= 2:
+        # Limit max 5 chunks per source
+        if source_count.get(src, 0) >= 5:
             continue
 
         context.append(chunks[idx])
@@ -92,7 +100,7 @@ def rag_query(question, chunks, sources, index, k=8):
     prompt = f"""
 You are an analytical assistant.
 
-Answer the question using the context below.
+Answer the question using ONLY the context below.
 If the answer is not present, say:
 "The information is not available in the provided sources."
 
@@ -105,5 +113,5 @@ Question:
 Answer:
 """
 
-    answer = ask_groq(prompt)
+    answer = ask_groq(prompt, api_key)
     return answer, list(used_sources)

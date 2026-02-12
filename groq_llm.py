@@ -1,24 +1,22 @@
 import requests
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-def ask_groq(prompt):
-    if not GROQ_API_KEY:
-        return "❌ GROQ_API_KEY not found. Check your .env file."
+def ask_groq(prompt, api_key):
+
+    if not api_key:
+        return "❌ Groq API key not provided."
 
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
 
     payload = {
         "model": "llama-3.1-8b-instant",
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
         "temperature": 0.2
     }
 
@@ -26,7 +24,6 @@ def ask_groq(prompt):
         r = requests.post(GROQ_URL, headers=headers, json=payload, timeout=20)
         data = r.json()
 
-        # 🔥 SAFETY CHECK
         if "choices" not in data:
             return f"⚠️ Groq API Error: {data}"
 
@@ -34,6 +31,3 @@ def ask_groq(prompt):
 
     except Exception as e:
         return f"⚠️ Request failed: {str(e)}"
-
-    print("Groq key loaded:", bool(GROQ_API_KEY))
-
