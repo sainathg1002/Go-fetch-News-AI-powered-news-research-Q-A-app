@@ -1,93 +1,165 @@
-﻿# 🚀 GoFetch – AI-Powered News Research & Q&A Tool
+# 🔍 Go Fetch — RAG-Based News Research System
 
-I recently built a Streamlit-based intelligent research assistant that leverages Retrieval-Augmented Generation (RAG) to answer questions from multiple web sources with high accuracy and speed.
+> Ask any question. Get answers grounded in real news sources — not hallucinations.
 
-## ✨ Features
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
+[![LangGraph](https://img.shields.io/badge/LangGraph-Orchestration-green.svg)](https://langchain-ai.github.io/langgraph/)
+[![Groq](https://img.shields.io/badge/Groq-LLM%20API-orange.svg)](https://groq.com)
+[![FAISS](https://img.shields.io/badge/FAISS-Vector%20Search-red.svg)](https://faiss.ai)
 
-🔹 **🌐 Multi-Source Web Scraping**: Automatically extracts and processes content from multiple URLs simultaneously, intelligently parsing article content while filtering out navigation, scripts, and irrelevant elements.
+---
 
-🔹 **🧠 Semantic Search with FAISS**: Uses vector embeddings and FAISS indexing for lightning-fast similarity search, retrieving the most relevant context chunks to answer user queries accurately.
+## What Is This?
 
-🔹 **⚡ Groq LLM Integration**: Powered by Groq's ultra-fast LLM API (llama-3.1-8b-instant) for low-latency, high-quality responses with minimal hallucination.
+Go Fetch is a **Retrieval-Augmented Generation (RAG)** system that answers questions using real news articles — not the LLM's memory.
 
-🔹 **📊 Source Attribution**: Tracks and displays source URLs for every answer, ensuring transparency and verifiability of information.
+You give it a question → it fetches relevant news → retrieves the most relevant chunks → generates a grounded answer with sources.
 
-🔹 **🎨 Modern UI/UX**: Clean, responsive interface with gradient buttons, smooth animations, and a professional dark-themed design built with custom CSS.
+**No hallucinations. Every answer is backed by actual articles.**
 
-🔹 **🔄 Smart Context Balancing**: Implements source diversity logic to prevent over-reliance on a single URL, ensuring balanced and comprehensive answers.
+---
 
-## 🛠️ Tech Stack
+## How It Works
 
-- **Python** – Core programming language
-- **Streamlit** – Interactive web application framework
-- **Groq API** – Ultra-fast LLM inference
-- **FAISS** – Facebook AI Similarity Search for vector indexing
-- **Sentence Transformers** – all-MiniLM-L6-v2 for text embeddings
-- **BeautifulSoup4** – Web scraping and HTML parsing
-- **Requests** – HTTP library for fetching web content
-
-## 🧠 Key Learnings
-
-This project deepened my understanding of:
-- Building production-ready RAG pipelines with semantic retrieval
-- Optimizing vector search with FAISS for real-time performance
-- Web scraping strategies for clean content extraction
-- Prompt engineering for accurate, context-aware LLM responses
-- Creating intuitive UIs for AI applications with Streamlit
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.8+
-- Groq API Key ([Get one here](https://console.groq.com))
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd notebook
+```
+Your Question
+     │
+     ▼
+┌─────────────────┐
+│  News Fetcher   │  ← Pulls articles from news sources
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  FAISS Index    │  ← Breaks articles into chunks, stores as vectors
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│ Smart Retrieval │  ← Finds top 50 relevant chunks,
+│  (k=50, cap=5)  │    balanced across multiple sources
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Groq LLM      │  ← Generates answer using only retrieved context
+└────────┬────────┘
+         │
+         ▼
+  Answer + Sources
 ```
 
-2. Install dependencies:
+**Key design decision:** The retriever caps at 5 chunks per source. This prevents one dominant article from controlling the answer — giving you balanced, multi-perspective responses.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Orchestration | LangGraph |
+| LLM | Groq API (LLaMA-3) |
+| Vector Search | FAISS |
+| Embeddings | Sentence Transformers |
+| Backend | Python, FastAPI |
+| Prompt Design | Custom prompt engineering |
+
+---
+
+## Getting Started
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/yourusername/go-fetch.git
+cd go-fetch
+```
+
+### 2. Install dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+### 3. Set up your API key
+
+Create a `.env` file in the root folder:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
-4. Run the application:
+Get a free Groq API key at [console.groq.com](https://console.groq.com)
+
+### 4. Run the app
+
 ```bash
 streamlit run app.py
 ```
 
-## 📖 How It Works
-
-1. **Input URLs**: Enter up to 3 news article URLs
-2. **Processing**: The system scrapes, chunks, and indexes the content
-3. **Ask Questions**: Query the knowledge base with natural language
-4. **Get Answers**: Receive accurate, source-attributed responses in seconds
-
-## 🎯 Use Cases
-
-- 📰 News research and fact-checking
-- 📚 Academic research across multiple sources
-- 🔍 Competitive intelligence gathering
-- 📊 Market research and trend analysis
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
+Open your browser at `http://localhost:8501`
 
 ---
-📝 Note
 
-This project is built for learning, experimentation, and showcasing GenAI system design using real-world data and fast LLM inference.
+## Example Usage
 
-**Built by Venkata Sai** • AI & Full Stack Enthusiast
-=======
+```
+Question: "What are the latest developments in AI regulation?"
 
+→ Fetches 10 relevant news articles
+→ Chunks and indexes them into FAISS
+→ Retrieves top 50 relevant chunks (max 5 per article)
+→ Groq LLM synthesizes a grounded answer
+
+Answer: "According to Reuters (2026), the EU AI Act enforcement 
+began in Q1... Meanwhile, Bloomberg reports that the US Senate..."
+```
+
+---
+
+## Project Structure
+
+```
+go-fetch/
+├── app.py                  # Streamlit UI
+├── rag_pipeline.py         # Core RAG logic
+├── retriever.py            # FAISS indexing + smart retrieval
+├── news_fetcher.py         # Article fetching
+├── prompts.py              # Prompt templates
+├── requirements.txt
+└── .env.example
+```
+
+---
+
+## Why This Is Different From a Basic RAG
+
+| Basic RAG | Go Fetch |
+|---|---|
+| Simple top-k retrieval | Balanced multi-source retrieval |
+| Single source dominates | 5-chunk cap per source |
+| No orchestration | LangGraph state machine |
+| Slow retrieval | <1s latency |
+
+---
+
+## Requirements
+
+```
+Python 3.10+
+langchain
+langgraph
+groq
+faiss-cpu
+sentence-transformers
+streamlit
+fastapi
+python-dotenv
+```
+
+---
+
+## Author
+
+**Venkata Sainath Ganta**
+[GitHub](https://github.com/sainathg1002) • [LinkedIn](https://www.linkedin.com/in/venkata-sai-ganta-c300b200a100/) • [Portfolio](https://sainathg1002.github.io/sainath_portfolio/)
