@@ -16,6 +16,7 @@ Go Fetch is a **Retrieval-Augmented Generation (RAG)** system that answers quest
 You give it a question → it fetches relevant news → retrieves the most relevant chunks → generates a grounded answer with sources.
 
 **No hallucinations. Every answer is backed by actual articles.**
+**Live Link**: https://build-flow-ai.vercel.app/
 
 ---
 
